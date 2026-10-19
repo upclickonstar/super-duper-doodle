@@ -1,9 +1,8 @@
 {
   "scripts": {
-    "docs:build": "mkdir -p docs && git clone --depth=1 https://github.com temp-source && cp -r temp-source/docs/*.md docs/ && rm -rf temp-source && find docs/ -name '*.md' -exec sed -i 's/fmhy/FreeForUs/gI' {} + && find docs/ -name '*.md' -exec sed -i 's/freemediaheckyeah/FreeForUs/gI' {} + && vitepress build docs"
+    "docs:build": "mkdir -p docs && git clone --depth=1 https://github.com/fmhy/edit.git temp-source && cp -r temp-source/docs/*.md docs/ && rm -rf temp-source && find docs/ -name '*.md' -exec sed -i 's/fmhy/FreeForUs/gI' {} + && find docs/ -name '*.md' -exec sed -i 's/freemediaheckyeah/FreeForUs/gI' {} + && vitepress build docs"
   },
   "devDependencies": {
     "vitepress": "^1.5.0"
   }
 }
-
