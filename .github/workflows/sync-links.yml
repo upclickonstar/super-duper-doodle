@@ -8,9 +8,13 @@ on:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # Forces GitHub to give this specific script absolute write access
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }} # Automatically handles passwords safely
 
       - name: Fetch Core Content
         run: |
@@ -19,14 +23,14 @@ jobs:
           git remote add upstream https://github.com || true
           git fetch upstream main
           
-          # Safely pull only the raw markdown files containing the link lists
+          # Pull only the raw markdown files containing the link lists
           git checkout upstream/main -- docs/*.md
 
           # Strip original names and replace them with your custom name
           find docs/ -name "*.md" -exec sed -i 's/fmhy/FreeForUs/gI' {} +
           find docs/ -name "*.md" -exec sed -i 's/freemediaheckyeah/FreeForUs/gI' {} +
 
-          # Commit and Push back into your private repository
+          # Commit and Push back into your repository safely
           git add docs/
           git commit -m "Automated nightly link update" || exit 0
-          git push
+          git push origin main
