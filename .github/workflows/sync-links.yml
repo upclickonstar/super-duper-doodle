@@ -14,21 +14,26 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }} # Automatically handles passwords safely
+          persist-credentials: true
 
       - name: Fetch Core Content
         run: |
           git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@://github.com"
-          git remote add upstream https://github.com || true
-          git fetch upstream main
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          # Pull only the raw markdown files containing the link lists
-          git checkout upstream/main -- docs/*.md
+          # Safely download link lists using a temporary clone path to prevent messing up the main URL properties
+          git clone --depth=1 https://github.com temp-source
+          
+          # Move only the raw markdown links inside your docs folder
+          cp -r temp-source/docs/*.md docs/
+          rm -rf temp-source
 
           # Strip original names and replace them with your custom name
           find docs/ -name "*.md" -exec sed -i 's/fmhy/FreeForUs/gI' {} +
           find docs/ -name "*.md" -exec sed -i 's/freemediaheckyeah/FreeForUs/gI' {} +
+
+          # Manually set the correct origin path to guarantee it goes to your repo
+          git remote set-url origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@://github.com"
 
           # Commit and Push back into your repository safely
           git add docs/
