@@ -19,9 +19,12 @@ jobs:
       - name: Fetch Core Content
         run: |
           git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.email "github-actions[bot]@://github.com"
           
-          # Safely download link lists using a temporary clone path to prevent messing up the main URL properties
+          # Force create the destination docs directory so it definitely exists
+          mkdir -p docs
+          
+          # Safely download link lists using a temporary clone path
           git clone --depth=1 https://github.com temp-source
           
           # Move only the raw markdown links inside your docs folder
