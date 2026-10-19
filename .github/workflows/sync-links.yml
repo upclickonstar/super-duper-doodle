@@ -8,37 +8,28 @@ on:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write # Forces GitHub to give this specific script absolute write access
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
-        with:
-          persist-credentials: true
 
-      - name: Fetch Core Content
+      - name: Fetch and Clean Links
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@://github.com"
-          
-          # Force create the destination docs directory so it definitely exists
+          # Force create the docs folder
           mkdir -p docs
           
-          # Safely download link lists using a temporary clone path
+          # Download files safely into a temporary sandbox folder
           git clone --depth=1 https://github.com temp-source
           
-          # Move only the raw markdown links inside your docs folder
+          # Copy only the link files over
           cp -r temp-source/docs/*.md docs/
           rm -rf temp-source
 
-          # Strip original names and replace them with your custom name
+          # Strip old names and replace with your brand
           find docs/ -name "*.md" -exec sed -i 's/fmhy/FreeForUs/gI' {} +
           find docs/ -name "*.md" -exec sed -i 's/freemediaheckyeah/FreeForUs/gI' {} +
 
-          # Manually set the correct origin path to guarantee it goes to your repo
-          git remote set-url origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@://github.com"
-
-          # Commit and Push back into your repository safely
-          git add docs/
-          git commit -m "Automated nightly link update" || exit 0
-          git push origin main
+      - name: Force Push Updates Live
+        uses: mikeal/publish-to-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH_NAME: 'main'
